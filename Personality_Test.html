@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 650px;
+      margin: auto;
+      padding: 20px;
+      background: #f9f9fc;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #4a4ae6;
+    }
+    .question-container, #result, #breakdown {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .show {
+      opacity: 1 !important;
+    }
+    .question {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      font-weight: bold;
+      color: #222;
+    }
+    .options button {
+      display: block;
+      margin: 8px 0;
+      padding: 12px;
+      width: 100%;
+      border-radius: 10px;
+      border: none;
+      background: #e0e7ff;
+      color: #222;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .options button:hover {
+      background: #c7d2fe;
+      transform: scale(1.02);
+    }
+    #backButton {
+      display: block;
+      margin: 15px 0 0;
+      padding: 10px;
+      width: 100%;
+      border-radius: 10px;
+      border: none;
+      background: #f3f4f6;
+      color: #222;
+      cursor: pointer;
+      font-size: 1em;
+      transition: all 0.2s ease;
+    }
+    #backButton:hover {
+      background: #e5e7eb;
+    }
+    #result {
+      margin-top: 25px;
+      font-weight: bold;
+      font-size: 1.2em;
+      padding: 15px;
+      border-radius: 10px;
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+    }
+    #breakdown {
+      margin-top: 20px;
+      font-size: 1em;
+      background: #f3f4f6;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+    }
+    ul { list-style: none; padding: 0; }
+    ul li { margin: 5px 0; }
+    .progress {
+      margin: 15px 0;
+      height: 12px;
+      background: #e5e7eb;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: #4a4ae6;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <h1>Personality Quiz</h1>
+  <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+  <div id="quiz" class="question-container"></div>
+  <div id="result"></div>
+  <div id="breakdown"></div>
+
+  <script>
+    const questions = [
+{
+        text: "1 Which word describes you best?",
+        options: [
+          { answer: "Adventurous", category: "B" },
+          { answer: "Adaptable", category: "D" },
+          { answer: "Animated", category: "A" },
+          { answer: "Analytical", category: "C" }
+        ]
+      },
+      {
+        text: "2 Pick the word that fits you:",
+        options: [
+          { answer: "Persistent", category: "C" },
+          { answer: "Playful", category: "A" },
+          { answer: "Persuasive", category: "B" },
+          { answer: "Peaceful", category: "D" }
+        ]
+      },
+      {
+        text: "3 Choose a word:",
+        options: [
+          { answer: "Submissive", category: "D" },
+          { answer: "Self sacrificing", category: "C" },
+          { answer: "Sociable", category: "A" },
+          { answer: "Strong willed", category: "B" }
+        ]
+      },
+     {
+        text: "4 Which word describes you best?",
+        options: [
+          { answer: "Considerate", category: "C" },
+          { answer: "Controlled", category: "D" },
+          { answer: "Competitive", category: "B" },
+          { answer: "Convincing", category: "A" }
+        ]
+      },
+      {
+        text: "5 Pick the word that fits you:",
+        options: [
+          { answer: "Refreshing", category: "A" },
+          { answer: "Respectful", category: "C" },
+          { answer: "Reserved", category: "D" },
+          { answer: "Resourceful", category: "B" }
+        ]
+      },
+      {
+        text: "6 Choose a word:",
+        options: [
+          { answer: "Satisfied", category: "D" },
+          { answer: "Sensitive", category: "C" },
+          { answer: "Self reliant", category: "B" },
+          { answer: "Spirited", category: "A" }
+        ]
+      }, 
+      {
+        text: "7 Which word describes you best?",
+        options: [
+          { answer: "Planner", category: "C" },
+          { answer: "Patient", category: "D" },
+          { answer: "Positive", category: "B" },
+          { answer: "Promoter", category: "A" }
+        ]
+      },
+      {
+        text: "8 Pick the word that fits you:",
+        options: [
+          { answer: "Sure", category: "B" },
+          { answer: "Spontaneous", category: "A" },
+          { answer: "Scheduled", category: "C" },
+          { answer: "Shy", category: "D" }
+        ]
+      },
+      {
+        text: "9 Choose a word:",
+        options: [
+          { answer: "Orderly", category: "C" },
+          { answer: "Obliging", category: "D" },
+          { answer: "Outspoken", category: "B" },
+          { answer: "Optimistic", category: "A" }
+        ]
+      },
+            {
+        text: "10 Which word describes you best?",
+        options: [
+          { answer: "Friendly", category: "D" },
+          { answer: "Faithful", category: "C" },
+          { answer: "Funny", category: "A" },
+          { answer: "Forceful", category: "B" }
+        ]
+      },
+      {
+        text: "11 Pick the word that fits you:",
+        options: [
+          { answer: "Daring", category: "B" },
+          { answer: "Delightful", category: "A" },
+          { answer: "Diplomatic", category: "D" },
+          { answer: "Detailed", category: "C" }
+        ]
+      },
+      {
+        text: "12 Choose a word:",
+        options: [
+          { answer: "Cheerful", category: "A" },
+          { answer: "Consistent", category: "D" },
+          { answer: "Cultured", category: "C" },
+          { answer: "Confident", category: "B" }
+        ]
+      },
+     {
+        text: "13 Which word describes you best?",
+        options: [
+          { answer: "Idealistic", category: "C" },
+          { answer: "Independent", category: "D" },
+          { answer: "Inoffensive", category: "B" },
+          { answer: "Inspiring", category: "A" }
+        ]
+      },
+      {
+        text: "14 Pick the word that fits you:",
+        options: [
+          { answer: "Demonstrative", category: "A" },
+          { answer: "Decisive", category: "B" },
+          { answer: "Dry Humor", category: "D" },
+          { answer: "Deep", category: "C" }
+        ]
+      },
+      {
+        text: "15 Choose a word:",
+        options: [
+          { answer: "Mediator", category: "D" },
+          { answer: "Musical", category: "C" },
+          { answer: "Mover", category: "B" },
+          { answer: "Mixes Easily", category: "A" }
+        ]
+      }, 
+      {
+        text: "16 Which word describes you best?",
+        options: [
+          { answer: "Thoughtful", category: "C" },
+          { answer: "Tenacious", category: "B" },
+          { answer: "Talker", category: "A" },
+          { answer: "Tolerant", category: "D" }
+        ]
+      },
+      {
+        text: "17 Pick the word that fits you:",
+        options: [
+          { answer: "Listener", category: "D" },
+          { answer: "Loyal", category: "C" },
+          { answer: "Leader", category: "B" },
+          { answer: "Lively", category: "A" }
+        ]
+      },
+      {
+        text: "18 Choose a word:",
+        options: [
+          { answer: "Contented", category: "D" },
+          { answer: "Chief", category: "B" },
+          { answer: "Chart maker", category: "C" },
+          { answer: "Cute", category: "A" }
+        ]
+      },
+      {
+        text: "19 Which word describes you best?",
+        options: [
+          { answer: "Perfectionist", category: "C" },
+          { answer: "Pleasant", category: "D" },
+          { answer: "Productive", category: "B" },
+          { answer: "Popular", category: "A" }
+        ]
+      },
+      {
+        text: "20 Pick the word that fits you:",
+        options: [
+          { answer: "Bouncy", category: "A" },
+          { answer: "Bold", category: "B" },
+          { answer: "Behaved", category: "C" },
+          { answer: "Balanced", category: "D" }
+        ]
+      },
+      {
+        text: "21 Choose a word:",
+        options: [
+          { answer: "Blank", category: "D" },
+          { answer: "Bashful", category: "C" },
+          { answer: "Brassy", category: "A" },
+          { answer: "Bossy", category: "B" }
+        ]
+      },
+     {
+        text: "22 Which word describes you best?",
+        options: [
+          { answer: "Undisciplined", category: "A" },
+          { answer: "Unsympathetic", category: "B" },
+          { answer: "Unenthusiastic", category: "D" },
+          { answer: "Unforgiving", category: "C" }
+        ]
+      },
+      {
+        text: "23 Pick the word that fits you:",
+        options: [
+          { answer: "Reticent", category: "D" },
+          { answer: "Resentful", category: "C" },
+          { answer: "Resistant", category: "B" },
+          { answer: "Repetitious", category: "A" }
+        ]
+      },
+      {
+        text: "24 Choose a word:",
+        options: [
+          { answer: "Fussy", category: "C" },
+          { answer: "Fearful", category: "D" },
+          { answer: "Forgetful", category: "A" },
+          { answer: "Frank", category: "B" }
+        ]
+      }, 
+      {
+        text: "25 Which word describes you best?",
+        options: [
+          { answer: "Impatient", category: "B" },
+          { answer: "Insecure", category: "C" },
+          { answer: "Indecisive", category: "D" },
+          { answer: "Interrupts", category: "A" }
+        ]
+      },
+      {
+        text: "26 Pick the word that fits you:",
+        options: [
+          { answer: "Unpopular", category: "C" },
+          { answer: "Uninvolved", category: "D" },
+          { answer: "Unpredictable", category: "A" },
+          { answer: "Unaffectionate", category: "B" }
+        ]
+      },
+      {
+        text: "27 Choose a word:",
+        options: [
+          { answer: "Headstrong", category: "B" },
+          { answer: "Haphazard", category: "A" },
+          { answer: "Hard to please", category: "C" },
+          { answer: "Hesistant", category: "D" }
+        ]
+      },
+            {
+        text: "28 Which word describes you best?",
+        options: [
+          { answer: "Plain", category: "D" },
+          { answer: "Pessimistic", category: "C" },
+          { answer: "Proud", category: "B" },
+          { answer: "Permissive", category: "A" }
+        ]
+      },
+      {
+        text: "29 Pick the word that fits you:",
+        options: [
+          { answer: "Angered easily", category: "A" },
+          { answer: "Aimless", category: "D" },
+          { answer: "Argumentative", category: "B" },
+          { answer: "Alienated", category: "C" }
+        ]
+      },
+      {
+        text: "30 Choose a word:",
+        options: [
+          { answer: "Naive", category: "A" },
+          { answer: "Negative attitude", category: "C" },
+          { answer: "Nervy", category: "B" },
+          { answer: "Nonchalant", category: "D" }
+        ]
+      },
+     {
+        text: "31 Which word describes you best?",
+        options: [
+          { answer: "Worrier", category: "D" },
+          { answer: "Withdrawn", category: "C" },
+          { answer: "Workaholic", category: "B" },
+          { answer: "Wants credit", category: "A" }
+        ]
+      },
+      {
+        text: "32 Pick the word that fits you:",
+        options: [
+          { answer: "Too sensitive", category: "C" },
+          { answer: "Tactless", category: "B" },
+          { answer: "Timid", category: "D" },
+          { answer: "Talkative", category: "A" }
+        ]
+      },
+      {
+        text: "33 Choose a word:",
+        options: [
+          { answer: "Doubtful", category: "D" },
+          { answer: "Disorganized", category: "A" },
+          { answer: "Domineering", category: "B" },
+          { answer: "Depressed", category: "C" }
+        ]
+      }, 
+      {
+        text: "34 Which word describes you best?",
+        options: [
+          { answer: "Inconsistent", category: "A" },
+          { answer: "Introvert", category: "C" },
+          { answer: "Intolerant", category: "B" },
+          { answer: "Indifferent", category: "D" }
+        ]
+      },
+      {
+        text: "35 Pick the word that fits you:",
+        options: [
+          { answer: "Messy", category: "A" },
+          { answer: "Moody", category: "C" },
+          { answer: "Mumbles", category: "D" },
+          { answer: "Manipulative", category: "B" }
+        ]
+      },
+      {
+        text: "36 Choose a word:",
+        options: [
+          { answer: "Slow", category: "D" },
+          { answer: "Stubborn", category: "B" },
+          { answer: "Show-off", category: "A" },
+          { answer: "Skeptical", category: "C" }
+        ]
+      },
+      {
+        text: "37 Choose a word:",
+        options: [
+          { answer: "Loner", category: "C" },
+          { answer: "Lord over others", category: "B" },
+          { answer: "Lazy", category: "D" },
+          { answer: "Loud", category: "A" }
+        ]
+      },
+            {
+        text: "38 Which word describes you best?",
+        options: [
+          { answer: "Sluggish", category: "D" },
+          { answer: "Suspicious", category: "C" },
+          { answer: "Short tempered", category: "B" },
+          { answer: "Scatterbrained", category: "A" }
+        ]
+      },
+      {
+        text: "39 Pick the word that fits you:",
+        options: [
+          { answer: "Revengeful", category: "C" },
+          { answer: "Restless", category: "A" },
+          { answer: "Reluctant", category: "D" },
+          { answer: "Rash", category: "B" }
+        ]
+      },
+      {
+        text: "40 Choose a word:",
+        options: [
+          { answer: "Compromising", category: "D" },
+          { answer: "Critical", category: "C" },
+          { answer: "Crafty", category: "B" },
+          { answer: "Changeable", category: "A" }
+        ]
+      },
+    ];
+
+    const categoryDescriptions = {
+      A: "Category A: Popular Entertainer",
+      B: "Category B: Powerful Leader",
+      C: "Category C: Perfectionist Artistic",
+      D: "Category D: Peaceful Friendly"
+    };
+
+    let currentQuestion = 0;
+    const scores = { A: 0, B: 0, C: 0, D: 0 };
+    const previousAnswers = [];
+
+    function updateProgress() {
+      const percent = (currentQuestion / questions.length) * 100;
+      document.getElementById("progressBar").style.width = percent + "%";
+    }
+
+    function showQuestion() {
+      updateProgress();
+      if (currentQuestion < questions.length) {
+        const q = questions[currentQuestion];
+        const quizDiv = document.getElementById("quiz");
+        quizDiv.classList.remove("show");
+        setTimeout(() => {
+          quizDiv.innerHTML = `
+            <div class='question'>${q.text}</div>
+            <div class='options'>
+              ${q.options.map(o => `<button onclick="choose('${o.category}')">${o.answer}</button>`).join('')}
+            </div>
+            ${currentQuestion > 0 ? `<button id='backButton' onclick='goBack()'>Back</button>` : ''}
+          `;
+          quizDiv.classList.add("show");
+        }, 200);
+      } else {
+        showResult();
+      }
+    }
+
+    function choose(category) {
+      if (previousAnswers[currentQuestion] !== undefined) {
+        scores[previousAnswers[currentQuestion]]--;
+      }
+      scores[category]++;
+      previousAnswers[currentQuestion] = category;
+      currentQuestion++;
+      showQuestion();
+    }
+
+    function goBack() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        const prevCategory = previousAnswers[currentQuestion];
+        if (prevCategory) scores[prevCategory]--;
+        showQuestion();
+      }
+    }
+
+    function showResult() {
+      updateProgress();
+      const maxScore = Math.max(...Object.values(scores));
+      const topCategories = Object.keys(scores).filter(cat => scores[cat] === maxScore);
+
+      const quizDiv = document.getElementById("quiz");
+      quizDiv.innerHTML = "";
+
+      const resultDiv = document.getElementById("result");
+      const breakdownDiv = document.getElementById("breakdown");
+
+      if (topCategories.length === 1) {
+        resultDiv.innerText = categoryDescriptions[topCategories[0]];
+      } else {
+        let tieText = "It's a tie between: \n\n";
+        tieText += topCategories.map(cat => categoryDescriptions[cat]).join("\n\n");
+        resultDiv.innerText = tieText;
+      }
+
+      let breakdownHTML = "<h3>Score Breakdown:</h3><ul>";
+      for (const [cat, score] of Object.entries(scores)) {
+        breakdownHTML += `<li>${cat}: ${score}</li>`;
+      }
+      breakdownHTML += "</ul>";
+      breakdownDiv.innerHTML = breakdownHTML;
+
+      setTimeout(() => {
+        resultDiv.classList.add("show");
+        breakdownDiv.classList.add("show");
+      }, 200);
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
