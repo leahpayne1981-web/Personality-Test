@@ -1,111 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Quiz</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      max-width: 650px;
-      margin: auto;
-      padding: 20px;
-      background: #f9f9fc;
-      color: #333;
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
     }
-    h1 {
+
+    .quiz-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 600px;
+      padding: 20px 30px;
       text-align: center;
-      color: #4a4ae6;
+      animation: fadeIn 0.5s ease-in-out;
     }
-    .question-container, #result, #breakdown {
-      opacity: 0;
-      transition: opacity 0.5s ease;
+
+    h2 {
+      margin-bottom: 20px;
     }
-    .show {
-      opacity: 1 !important;
-    }
-    .question {
-      font-size: 1.3em;
-      margin-bottom: 15px;
-      font-weight: bold;
-      color: #222;
-    }
+
     .options button {
       display: block;
+      width: 100%;
       margin: 8px 0;
       padding: 12px;
-      width: 100%;
-      border-radius: 10px;
+      font-size: 16px;
       border: none;
-      background: #e0e7ff;
-      color: #222;
-      font-size: 1em;
+      border-radius: 8px;
+      background: #e3eaf2;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: 0.3s;
     }
+
     .options button:hover {
-      background: #c7d2fe;
-      transform: scale(1.02);
+      background: #d0ddec;
     }
-    #backButton {
-      display: block;
-      margin: 15px 0 0;
-      padding: 10px;
-      width: 100%;
-      border-radius: 10px;
-      border: none;
-      background: #f3f4f6;
-      color: #222;
-      cursor: pointer;
-      font-size: 1em;
-      transition: all 0.2s ease;
-    }
-    #backButton:hover {
-      background: #e5e7eb;
-    }
-    #result {
-      margin-top: 25px;
-      font-weight: bold;
-      font-size: 1.2em;
-      padding: 15px;
-      border-radius: 10px;
-      background: #fef3c7;
-      border: 1px solid #fcd34d;
-    }
-    #breakdown {
+
+    .nav-buttons {
       margin-top: 20px;
-      font-size: 1em;
-      background: #f3f4f6;
-      padding: 15px;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
+      display: flex;
+      justify-content: space-between;
     }
-    ul { list-style: none; padding: 0; }
-    ul li { margin: 5px 0; }
-    .progress {
-      margin: 15px 0;
-      height: 12px;
-      background: #e5e7eb;
-      border-radius: 6px;
-      overflow: hidden;
+
+    .nav-buttons button {
+      flex: 1;
+      margin: 0 5px;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
     }
-    .progress-bar {
-      height: 100%;
-      width: 0;
-      background: #4a4ae6;
-      transition: width 0.3s ease;
+
+    .back-btn {
+      background: #f2dede;
+    }
+
+    .back-btn:hover {
+      background: #e4c4c4;
+    }
+
+    .next-btn {
+      background: #d9edf7;
+    }
+
+    .next-btn:hover {
+      background: #bcdff1;
+    }
+
+    .result {
+      font-size: 18px;
+      padding: 20px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
     }
   </style>
 </head>
 <body>
-  <h1>Personality Quiz</h1>
-  <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
-  <div id="quiz" class="question-container"></div>
-  <div id="result"></div>
-  <div id="breakdown"></div>
+  <div class="quiz-container" id="quiz">
+    <h2 id="question">Loading...</h2>
+    <div class="options" id="options"></div>
+    <div class="nav-buttons">
+      <button class="back-btn" onclick="prevQuestion()" style="display:none;">⬅ Back</button>
+    </div>
+  </div>
 
   <script>
     const questions = [
+      // ✅ Paste your full 40-question array here!
+      // Example structure:
 {
         text: "1 Which word describes you best?",
         options: [
@@ -468,95 +468,72 @@
       },
     ];
 
-    const categoryDescriptions = {
-      A: "Category A: Popular Entertainer",
-      B: "Category B: Powerful Leader",
-      C: "Category C: Perfectionist Artistic",
-      D: "Category D: Peaceful Friendly"
-    };
-
     let currentQuestion = 0;
-    const scores = { A: 0, B: 0, C: 0, D: 0 };
-    const previousAnswers = [];
+    let scores = { A: 0, B: 0, C: 0, D: 0 };
+    let previousAnswers = [];
 
-    function updateProgress() {
-      const percent = (currentQuestion / questions.length) * 100;
-      document.getElementById("progressBar").style.width = percent + "%";
-    }
+    function loadQuestion() {
+      const questionEl = document.getElementById("question");
+      const optionsEl = document.getElementById("options");
+      const backBtn = document.querySelector(".back-btn");
 
-    function showQuestion() {
-      updateProgress();
-      if (currentQuestion < questions.length) {
-        const q = questions[currentQuestion];
-        const quizDiv = document.getElementById("quiz");
-        quizDiv.classList.remove("show");
-        setTimeout(() => {
-          quizDiv.innerHTML = `
-            <div class='question'>${q.text}</div>
-            <div class='options'>
-              ${q.options.map(o => `<button onclick="choose('${o.category}')">${o.answer}</button>`).join('')}
-            </div>
-            ${currentQuestion > 0 ? `<button id='backButton' onclick='goBack()'>Back</button>` : ''}
-          `;
-          quizDiv.classList.add("show");
-        }, 200);
-      } else {
+      // If quiz is done, show result
+      if (currentQuestion >= questions.length) {
         showResult();
+        return;
       }
+
+      const q = questions[currentQuestion];
+      questionEl.textContent = q.text;
+      optionsEl.innerHTML = "";
+
+      q.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt.answer;
+        btn.onclick = () => selectAnswer(opt.category);
+        optionsEl.appendChild(btn);
+      });
+
+      // Show/hide Back button
+      backBtn.style.display = currentQuestion > 0 ? "inline-block" : "none";
     }
 
-    function choose(category) {
-      if (previousAnswers[currentQuestion] !== undefined) {
+    function selectAnswer(category) {
+      // If revisiting, adjust score
+      if (previousAnswers[currentQuestion]) {
         scores[previousAnswers[currentQuestion]]--;
       }
       scores[category]++;
       previousAnswers[currentQuestion] = category;
+
       currentQuestion++;
-      showQuestion();
+      loadQuestion();
     }
 
-    function goBack() {
+    function prevQuestion() {
       if (currentQuestion > 0) {
         currentQuestion--;
-        const prevCategory = previousAnswers[currentQuestion];
-        if (prevCategory) scores[prevCategory]--;
-        showQuestion();
+        loadQuestion();
       }
     }
 
     function showResult() {
-      updateProgress();
-      const maxScore = Math.max(...Object.values(scores));
-      const topCategories = Object.keys(scores).filter(cat => scores[cat] === maxScore);
-
-      const quizDiv = document.getElementById("quiz");
-      quizDiv.innerHTML = "";
-
-      const resultDiv = document.getElementById("result");
-      const breakdownDiv = document.getElementById("breakdown");
-
-      if (topCategories.length === 1) {
-        resultDiv.innerText = categoryDescriptions[topCategories[0]];
-      } else {
-        let tieText = "It's a tie between: \n\n";
-        tieText += topCategories.map(cat => categoryDescriptions[cat]).join("\n\n");
-        resultDiv.innerText = tieText;
-      }
-
-      let breakdownHTML = "<h3>Score Breakdown:</h3><ul>";
-      for (const [cat, score] of Object.entries(scores)) {
-        breakdownHTML += `<li>${cat}: ${score}</li>`;
-      }
-      breakdownHTML += "</ul>";
-      breakdownDiv.innerHTML = breakdownHTML;
-
-      setTimeout(() => {
-        resultDiv.classList.add("show");
-        breakdownDiv.classList.add("show");
-      }, 200);
+      const quizEl = document.getElementById("quiz");
+      quizEl.innerHTML = `
+        <div class="result">
+          <h2>Your Results</h2>
+          <p>A: ${scores.A}</p>
+          <p>B: ${scores.B}</p>
+          <p>C: ${scores.C}</p>
+          <p>D: ${scores.D}</p>
+          <h3>Highest Category: ${
+            Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0]
+          }</h3>
+        </div>
+      `;
     }
 
-    showQuestion();
+    loadQuestion();
   </script>
 </body>
 </html>
